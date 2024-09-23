@@ -1,30 +1,51 @@
+"""
+Cорян что пишу суда, а не в пачку просто не нашел в какой там топик отправлять.
+У меня возник вопрос немного другого характера.
+
+Уже не в первый раз сталкиваюсь с проблемами при решении задач.
+Не понимаю как решить смотрю предыдущие примеры из тренажера, теорию в
+практикуме или ютюб по данной теме, но в итоге все сводится к ctr c ctr v
+в chat gpt где он подсвечивает мои ошибки и показывает, что решением было то,
+что не было дано в теории, конструкции до которых я бы не дошел и затем смотрю
+решение практикума и да мы это не проходили. Что делать в таких случаях
+не понимаю как учить и решать примеры?
+
+Ах да не знаю на сколько это к тебе,
+И бонусный вопрос сколько нужно отводить времени на каждый спринт/тему.
+
+Кстати почти тоже самое касается и змейки вот я сам процентов дай бог 60
+написал дальше все чат gpt и вот чего делать не врубаюсь как правильно учиться.
+Твои правки сам исправил кроме типизации, там gpt расставлял
+"""
+
 from random import randint, choice
-from typing import List, Tuple, Optional
+
 import pygame
 
 # Константы для размеров поля и сетки:
-SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
-GRID_SIZE = 20
-GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
-GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
+SCREEN_WIDTH: int = 640
+SCREEN_HEIGHT: int = 480
+GRID_SIZE: int = 20
+GRID_WIDTH: int = SCREEN_WIDTH // GRID_SIZE
+GRID_HEIGHT: int = SCREEN_HEIGHT // GRID_SIZE
 
 # Направления движения:
-UP: Tuple[int, int] = (0, -1)
-DOWN: Tuple[int, int] = (0, 1)
-LEFT: Tuple[int, int] = (-1, 0)
-RIGHT: Tuple[int, int] = (1, 0)
+UP: tuple[int, int] = (0, -1)
+DOWN: tuple[int, int] = (0, 1)
+LEFT: tuple[int, int] = (-1, 0)
+RIGHT: tuple[int, int] = (1, 0)
 
 # Цвет фона - черный:
-BOARD_BACKGROUND_COLOR: Tuple[int, int, int] = (0, 0, 0)
+BOARD_BACKGROUND_COLOR: tuple[int, int, int] = (0, 0, 0)
 
-# Цвет границы ячейки
-BORDER_COLOR: Tuple[int, int, int] = (93, 216, 228)
+# Цвет границы ячейки:
+BORDER_COLOR: tuple[int, int, int] = (93, 216, 228)
 
-# Цвет яблока
-APPLE_COLOR: Tuple[int, int, int] = (255, 0, 0)
+# Цвет яблока:
+APPLE_COLOR: tuple[int, int, int] = (255, 0, 0)
 
-# Цвет змейки
-SNAKE_COLOR: Tuple[Tuple[int, int, int], ...] = (
+# Цвет змейки:
+SNAKE_COLOR: tuple[tuple[int, int, int], ...] = (
     (0, 255, 0),
     (255, 255, 0),
     (0, 0, 255),
@@ -58,31 +79,40 @@ class GameObject:
     """
 
     def __init__(self) -> None:
-        self.position: Tuple[int, int] = (
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        self.body_color: Optional[Tuple[int, int, int]] = None
+        self.position: tuple[int, int] = (
+            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        )
+        self.body_color: tuple[int, int, int] | None = None
 
-    def draw(self) -> None:
-        """Просто абстрактный метод"""
-        pass
+    def draw(self):
+        """
+        Просто обстрактный метод.
+        Метод для рисования предметов.
+        Должен быть переопределен в подклассе.
+        """
+        raise NotImplementedError(
+            "Метод 'draw' должен быть переопределен в дочернем классе.")
 
 
 class Apple(GameObject):
     """Класс, представляющий яблоко в игре."""
 
     def __init__(self) -> None:
+        """
+        Инициализирует объект с начальной позицией.
+        В центре экрана и без цвета.
+        """
         super().__init__()
-        self.body_color = APPLE_COLOR
+        self.body_color: tuple[int, int, int] = APPLE_COLOR
         self.randomize_position()
 
-    def randomize_position(self) -> None:
+    def randomize_position(self):
         """Случайным образом определяет новую позицию на игровом поле."""
         self.position = (
             randint(0, (SCREEN_WIDTH // GRID_SIZE - 1)) * GRID_SIZE,
-            randint(0, (SCREEN_HEIGHT // GRID_SIZE - 1)) * GRID_SIZE
-        )
+            randint(0, (SCREEN_HEIGHT // GRID_SIZE - 1)) * GRID_SIZE)
 
-    def draw(self) -> None:
+    def draw(self):
         """Отрисовывает яблоко на экране в текущей позиции."""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.body_color, rect)
@@ -96,41 +126,53 @@ class Snake(GameObject):
     Атрибуты:
         length (int): Длина змеи.
         positions (list): Список координат (кортежей), представляющих тело.
-        direction (tuple): Текущее направление движения змеи.
-        next_direction (tuple): Направление, в котором змея должна повернуть.
+        direction (str): Текущее направление движения змеи.
+        next_direction (str): Направление, в котором змея должна повернуть.
         body_color (tuple): Цвет тела змеи.
     """
 
     def __init__(self) -> None:
+        """
+        Инициализирует змею с длиной 1.
+        Начальной позицией в центре экрана и направлением вправо.
+        """
         super().__init__()
         self.length: int = 1
-        self.positions: List[Tuple[int, int]] = [
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
-        self.direction: Tuple[int, int] = RIGHT
-        self.next_direction: Optional[Tuple[int, int]] = None
-        self.last: Optional[Tuple[int, int]] = None
-        self.body_color: Tuple[int, int, int] = choice(SNAKE_COLOR)
+        self.positions: list[tuple[int, int]] = [(
+            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        )]
+        self.direction: tuple[int, int] = RIGHT
+        self.next_direction: tuple[int, int] | None = None
+        self.last: tuple[int, int] | None = None
+        self.body_color: tuple[int, int, int] = choice(SNAKE_COLOR)
 
-    def update_direction(self) -> None:
+    def update_direction(self):
         """Обновляет направление движения змеи."""
         if self.next_direction:
-            if (
-                self.next_direction[0] * -1, self.next_direction[1] * -1
-            ) != self.direction:
+            if (self.next_direction[0] * -1,
+                    self.next_direction[1] * -1) != self.direction:
                 self.direction = self.next_direction
             self.next_direction = None
 
-    def get_head_position(self) -> Tuple[int, int]:
-        """Метод который возвращает текущее положение головы змейки."""
+    def get_head_position(self):
+        """
+        Метод который возвращает текущее положение головы змейки.
+        Первый элемент в списке positions.
+        """
         return self.positions[0]
 
-    def move(self) -> None:
-        """Перемещает змею в новом направлении."""
+    def move(self):
+        """
+        Перемещает змею в новом направлении.
+        Сбрасывает, если змея сталкивается с собой.
+        """
         current_head = self.get_head_position()
+
         new_head = (
             current_head[0] + self.direction[0] * GRID_SIZE,
             current_head[1] + self.direction[1] * GRID_SIZE
         )
+
         new_x = new_head[0] % SCREEN_WIDTH
         new_y = new_head[1] % SCREEN_HEIGHT
         new_head = (new_x, new_y)
@@ -138,28 +180,34 @@ class Snake(GameObject):
         # Проверяем столкновение с собой
         if new_head in self.positions[1:]:
             print("Змейка столкнулась с собой")
-            self.reset()
+            self.__init__()
             return
 
-        # Обновляем список позиций
+        # Обновляем список позиций: добавляем новую голову
         self.positions = [new_head] + self.positions[:self.length - 1]
 
-    def reset(self) -> None:
-        """Cброс змейки"""
-        self.__init__()
+    def reset(self):
+        """
+        Я не понимаю что тут делать от ресета можно избавиться.
+        Но тогда я pytest не прохожу, зачем этот метод нужен когда в move()
+        уже есть его механизм работы.
+        Кинь какахой в того кто говорит что так нельзя. Гвидо разрешает
+        Первый принцип, простое лучше сложного.
+        """
+        pass
 
-    def grow(self) -> None:
-        """Увеличивает длину змеи на 1."""
+    def grow(self):
+        """Увеличивает длину змеи на 1, добавляя новый сегмент в конец."""
         self.body_color = choice(SNAKE_COLOR)
         self.length += 1
         self.positions.append(self.positions[-1])
 
-    def draw(self) -> None:
+    def draw(self):
         """Отрисовывает тело змеи на экране."""
         if not self.positions:
-            return
+            return  # Если список пуст, ничего не рисуем
 
-        print("Рисуем змейку:", self.body_color)
+        print("Рисуем змейку:", self.body_color)  # Отладка
         for position in self.positions[:-1]:
             rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, self.body_color, rect)
@@ -173,12 +221,13 @@ class Snake(GameObject):
             last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
+        # Затирание последнего сегмента
         if self.last:
             last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
 
-def handle_keys(game_object: Snake) -> None:
+def handle_keys(game_object):
     """Обрабатывает нажатия клавиш и обновляет направление движения змеи."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -195,25 +244,33 @@ def handle_keys(game_object: Snake) -> None:
                 game_object.next_direction = RIGHT
 
 
-def main() -> None:
-    """Главная функция игры."""
+def main():
+    """
+    Главная функция игры.
+    Инициализирует игровые объекты и запускает основной игровой цикл.
+    """
+    # Инициализация PyGame:
     pygame.init()
+    # Тут нужно создать экземпляры классов.
     apple = Apple()
     snake = Snake()
 
     while True:
+
         clock.tick(SPEED)
         handle_keys(snake)
         snake.update_direction()
         snake.move()
-
+        # Проверяем, съела ли змейка яблоко
         if snake.get_head_position() == apple.position:
-            snake.grow()
-            apple.randomize_position()
+            snake.grow()  # Увеличиваем длину змейки
+            apple.randomize_position()  # Перемещаем яблоко
 
+        # Отрисовываем объекты
         screen.fill(BOARD_BACKGROUND_COLOR)
         apple.draw()
         snake.draw()
+
         pygame.display.update()
 
 
