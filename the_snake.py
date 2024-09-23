@@ -138,11 +138,15 @@ class Snake(GameObject):
         # Проверяем столкновение с собой
         if new_head in self.positions[1:]:
             print("Змейка столкнулась с собой")
-            self.__init__()
+            self.reset()
             return
 
         # Обновляем список позиций
         self.positions = [new_head] + self.positions[:self.length - 1]
+
+    def reset(self) -> None:
+        """Cброс змейки"""
+        self.__init__()
 
     def grow(self) -> None:
         """Увеличивает длину змеи на 1."""
