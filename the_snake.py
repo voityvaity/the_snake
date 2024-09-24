@@ -1,23 +1,3 @@
-"""
-Cорян что пишу суда, а не в пачку просто не нашел в какой там топик отправлять.
-У меня возник вопрос немного другого характера.
-
-Уже не в первый раз сталкиваюсь с проблемами при решении задач.
-Не понимаю как решить смотрю предыдущие примеры из тренажера, теорию в
-практикуме или ютюб по данной теме, но в итоге все сводится к ctr c ctr v
-в chat gpt где он подсвечивает мои ошибки и показывает, что решением было то,
-что не было дано в теории, конструкции до которых я бы не дошел и затем смотрю
-решение практикума и да мы это не проходили. Что делать в таких случаях
-не понимаю как учить и решать примеры?
-
-Ах да не знаю на сколько это к тебе,
-И бонусный вопрос сколько нужно отводить времени на каждый спринт/тему.
-
-Кстати почти тоже самое касается и змейки вот я сам процентов дай бог 60
-написал дальше все чат gpt и вот чего делать не врубаюсь как правильно учиться.
-Твои правки сам исправил кроме типизации, там gpt расставлял
-"""
-
 from random import randint, choice
 
 import pygame
@@ -137,14 +117,16 @@ class Snake(GameObject):
         Начальной позицией в центре экрана и направлением вправо.
         """
         super().__init__()
-        self.length: int = 1
-        self.positions: list[tuple[int, int]] = [(
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        )]
-        self.direction: tuple[int, int] = RIGHT
-        self.next_direction: tuple[int, int] | None = None
+        self.reset()
         self.last: tuple[int, int] | None = None
         self.body_color: tuple[int, int, int] = choice(SNAKE_COLOR)
+
+    def reset(self):
+        """Метод сброса"""
+        self.length = 1
+        self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
+        self.direction = RIGHT
+        self.next_direction = None
 
     def update_direction(self):
         """Обновляет направление движения змеи."""
@@ -180,21 +162,11 @@ class Snake(GameObject):
         # Проверяем столкновение с собой
         if new_head in self.positions[1:]:
             print("Змейка столкнулась с собой")
-            self.__init__()
+            self.reset()
             return
 
         # Обновляем список позиций: добавляем новую голову
         self.positions = [new_head] + self.positions[:self.length - 1]
-
-    def reset(self):
-        """
-        Я не понимаю что тут делать от ресета можно избавиться.
-        Но тогда я pytest не прохожу, зачем этот метод нужен когда в move()
-        уже есть его механизм работы.
-        Кинь какахой в того кто говорит что так нельзя. Гвидо разрешает
-        Первый принцип, простое лучше сложного.
-        """
-        pass
 
     def grow(self):
         """Увеличивает длину змеи на 1, добавляя новый сегмент в конец."""
@@ -207,7 +179,6 @@ class Snake(GameObject):
         if not self.positions:
             return  # Если список пуст, ничего не рисуем
 
-        print("Рисуем змейку:", self.body_color)  # Отладка
         for position in self.positions[:-1]:
             rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, self.body_color, rect)
@@ -251,7 +222,6 @@ def main():
     """
     # Инициализация PyGame:
     pygame.init()
-    # Тут нужно создать экземпляры классов.
     apple = Apple()
     snake = Snake()
 
